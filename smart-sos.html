@@ -8,170 +8,385 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --primary-color: #2563EB;
-            --secondary-color: #10B981;
-            --accent-color: #EF4444;
-            --background-light: #F8FAFC;
-            --text-dark: #1E293B;
-            --text-medium: #64748B;
-            --text-light: #94A3B8;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-light);
-            color: var(--text-dark);
-        }
-
-        .navbar {
-            padding: 1rem 0;
-        }
-
+        /* Page specific styles */
         .sos-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 50vh;
-            padding: 2rem 0;
+            padding: 3rem 0;
         }
-
-        .sos-button {
+        
+        .sos-mega-button {
             width: 200px;
             height: 200px;
             border-radius: 50%;
             background-color: var(--accent-color);
-            color: white;
+            color: var(--white);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: none;
-            box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.3);
-            transition: all 0.3s ease;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
             animation: pulse 2s infinite;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .sos-mega-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .sos-mega-button i {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sos-description {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+        
+        .status-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            width: 100%;
+            margin-bottom: 2rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .status-message {
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-progress {
+            height: 6px;
+            border-radius: 3px;
+            background-color: var(--border-color);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.5s ease;
+        }
+        
+        .eta {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .eta-time {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .helper-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .helper-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+        
+        .helper-details {
+            text-align: left;
+        }
+        
+        .helper-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .helper-role {
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+        }
+        
+        .helper-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--warning-color);
+        }
+        
+        .helper-contact {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .contact-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--white);
+            background-color: var(--primary-color);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .contact-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .contact-btn.call {
+            background-color: var(--secondary-color);
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 300px;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .sos-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .option-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            border: 2px solid transparent;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+        
+        .option-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+        
+        .option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .emergency-contacts {
+            width: 100%;
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .contacts-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+        
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-item:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+        
+        .contact-checkbox {
+            margin-right: 1rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .contact-phone {
+            color: var(--text-medium);
+            font-size: 0.9375rem;
+        }
+        
+        .contact-action {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .contact-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            transition: all var(--transition-speed) ease;
+            border: none;
+        }
+        
+        .contact-action-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
         }
 
         @keyframes pulse {
             0% {
-                transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
             }
             70% {
-                transform: scale(1.05);
-                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
             }
             100% {
-                transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
             }
         }
-
-        .sos-button:hover {
-            transform: scale(1.05);
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
-        .sos-button i {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .sos-button span {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        .sos-options {
-            margin-top: 3rem;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .option-card {
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
-
-        .option-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .option-card .card-body {
-            padding: 1.5rem;
-        }
-
-        .option-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: rgba(37, 99, 235, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-        }
-
-        .option-icon i {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-        }
-
-        .contacts-container {
-            margin-top: 2rem;
-        }
-
-        .contact-badge {
-            display: inline-flex;
-            align-items: center;
-            background-color: #f1f5f9;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-badge img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-right: 0.5rem;
-            object-fit: cover;
-        }
-
-        .location-status {
-            display: flex;
-            align-items: center;
-            background-color: #e2e8f0;
-            padding: 0.75rem;
-            border-radius: 10px;
-            margin-top: 1rem;
-        }
-
-        .location-status i {
-            color: var(--secondary-color);
-            margin-right: 0.5rem;
-        }
-
-        .smartwatch-sync {
-            display: flex;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-
-        .smartwatch-icon {
-            width: 40px;
-            height: 40px;
-            background-color: #f1f5f9;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
+        
+        @media (max-width: 768px) {
+            .sos-mega-button {
+                width: 160px;
+                height: 160px;
+                font-size: 2rem;
+            }
+            
+            .sos-mega-button i {
+                font-size: 3rem;
+            }
+            
+            .option-card {
+                width: 140px;
+                padding: 1.25rem;
+            }
+            
+            .option-icon {
+                font-size: 2rem;
+            }
+            
+            .status-title {
+                font-size: 1.35rem;
+            }
+            
+            .status-icon {
+                font-size: 2.5rem;
+            }
+            
+            .eta-time {
+                font-size: 1.75rem;
+            }
+            
+            .helper-avatar {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .helper-name {
+                font-size: 1.15rem;
+            }
+            
+            .map-container {
+                height: 250px;
+            }
         }
     </style>
 </head>
@@ -207,7 +422,7 @@
         
         <!-- SOS Button -->
         <div class="sos-container">
-            <button class="sos-button">
+            <button class="sos-mega-button">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>SOS</span>
             </button>
