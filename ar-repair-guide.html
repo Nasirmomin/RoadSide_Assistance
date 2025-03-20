@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Repair Guide - Roadside Assistance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0052CC;
+            --primary-dark: #0747A6;
+            --primary-light: #4C9AFF;
+            --secondary-color: #36B37E;
+            --warning-color: #FFAB00;
+            --danger-color: #FF5630;
+            --info-color: #00B8D9;
+            --bg-light: #F4F5F7;
+            --text-dark: #172B4D;
+            --text-medium: #5E6C84;
+            --text-light: #8993A4;
+            --border-color: #DFE1E6;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navbar Styles */
+        .custom-navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand img {
+            height: 45px;
+        }
+
+        .navbar-nav .nav-item {
+            position: relative;
+            margin: 0 5px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 1rem 1.25rem;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 82, 204, 0.05);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(0, 82, 204, 0.1);
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 8px;
+        }
+
+        .nav-item.dropdown .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 82, 204, 0.05);
+            color: var(--primary-color);
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-light);
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .user-profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Main Content */
+        .page-title {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+        }
+        
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .camera-view {
+            background-color: #000;
+            border-radius: 15px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 82, 204, 0.2), rgba(54, 179, 126, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .camera-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .camera-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+            color: var(--text-medium);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 0 5px rgba(0, 82, 204, 0.2);
+        }
+
+        .step.completed {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
+        .instruction-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+
+        .instruction-header {
+            padding: 1.25rem;
+            background-color: rgba(0, 82, 204, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .instruction-content {
+            padding: 1.5rem;
+        }
+
+        .instruction-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .instruction-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-content {
+            flex-grow: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .step-description {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.prev {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .nav-btn.prev:hover {
+            background-color: #E5E7EB;
+        }
+
+        .nav-btn.next {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-btn.next:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 82, 204, 0.2);
+        }
+
+        .progress-container {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 20%;
+            transition: width 0.6s ease;
+            border-radius: 4px;
+        }
+
+        .video-tutorial {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background-color: #000;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .video-play {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .video-play:hover {
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .tutorial-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 0;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .tutorial-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 82, 204, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-heading {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .contact-info {
+            color: var(--text-medium);
+        }
+
+        .emergency-number {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .camera-view {
+                height: 300px;
+            }
+            
+            .navbar-collapse {
+                background-color: var(--white);
+                padding: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                margin-top: 0.5rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem;
+            }
+            
+            .user-profile {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .step {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            .video-thumbnail {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="https://storage.googleapis.com/roadassist-public/roadassist-logo.png" alt="RoadAssist Logo" height="45">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ai-diagnosis.html">
+                            <i class="fas fa-robot"></i> AI Diagnosis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="ar-repair-guide.html">
+                            <i class="fas fa-vr-cardboard"></i> AR Guide
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="predictive-maintenance.html">
+                            <i class="fas fa-tools"></i> Maintenance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fleet-management.html">
+                            <i class="fas fa-truck-moving"></i> Fleet
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-h"></i> More
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="smart-sos.html"><i class="fas fa-bell"></i> Smart SOS</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-map-marked-alt"></i> Traffic & Weather</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice-dollar"></i> Insurance Claims</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="#" class="user-profile">
+                        <img src="https://via.placeholder.com/32x32" alt="User">
+                        <span class="d-none d-md-inline">My Account</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <h1 class="page-title"><i class="fas fa-vr-cardboard"></i> Augmented Reality Repair Guide</h1>
+        
+        <div class="row">
+            <!-- AR View -->
+            <div class="col-lg-8">
+                <div class="camera-view">
+                    <div class="camera-overlay">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="camera-controls">
+                        <button class="camera-btn"><i class="fas fa-lightbulb"></i></button>
+                        <button class="camera-btn"><i class="fas fa-expand"></i></button>
+                        <button class="camera-btn"><i class="fas fa-camera"></i></button>
+                    </div>
+                </div>
+                
+                <div class="step-indicator">
+                    <div class="step completed">1</div>
+                    <div class="step active">2</div>
+                    <div class="step">3</div>
+                    <div class="step">4</div>
+                    <div class="step">5</div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Progress</span>
+                        <span>Step 2 of 5</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="nav-btn prev">
+                        <i class="fas fa-arrow-left"></i>
+                        Previous Step
+                    </button>
+                    <button class="nav-btn next">
+                        Next Step
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Instructions -->
+            <div class="col-lg-4">
+                <div class="instruction-card">
+                    <div class="instruction-header">
+                        <i class="fas fa-wrench"></i>
+                        Step 2: Loosen Lug Nuts
+                    </div>
+                    <div class="instruction-content">
+                        <div class="instruction-steps">
+                            <div class="instruction-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Locate Lug Wrench</div>
+                                    <div class="step-description">
+                                        Find the lug wrench in your vehicle's toolkit
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Position Wrench</div>
+                                    <div class="step-description">
+                                        Place wrench on lug nut and position for leverage
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Turn Counterclockwise</div>
+                                    <div class="step-description">
+                                        Turn wrench counterclockwise to loosen each nut
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Safety Check</div>
+                                    <div class="step-description">
+                                        Ensure all lug nuts are loose but still attached
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-tutorial">
+                    <div class="video-title">
+                        <i class="fas fa-play-circle"></i> Video Tutorial
+                    </div>
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/640x360/000000/FFFFFF/?text=Tire+Change+Tutorial" alt="Video Tutorial">
+                        <div class="video-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <button class="tutorial-btn">
+                        <i class="fas fa-play me-2"></i>Watch Full Tutorial
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4 class="footer-heading">RoadAssist</h4>
+                    <p class="text-muted">Your trusted partner for roadside assistance and vehicle maintenance.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="smart-sos.html" class="text-decoration-none">Emergency SOS</a></li>
+                        <li><a href="ai-diagnosis.html" class="text-decoration-none">AI Diagnosis</a></li>
+                        <li><a href="predictive-maintenance.html" class="text-decoration-none">Maintenance</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="contact-info mb-2">Emergency Assistance:</div>
+                    <div class="emergency-number mb-3">1-800-ROAD-HELP</div>
+                    <div class="contact-info">Available 24/7, nationwide.</div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">© 2023 RoadAssist. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS (only for navbar toggle functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

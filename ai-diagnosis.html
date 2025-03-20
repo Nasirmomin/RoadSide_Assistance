@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diagnosis - Roadside Assistance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0052CC;
+            --primary-dark: #0747A6;
+            --primary-light: #4C9AFF;
+            --secondary-color: #36B37E;
+            --warning-color: #FFAB00;
+            --danger-color: #FF5630;
+            --info-color: #00B8D9;
+            --bg-light: #F4F5F7;
+            --text-dark: #172B4D;
+            --text-medium: #5E6C84;
+            --text-light: #8993A4;
+            --border-color: #DFE1E6;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navbar Styles */
+        .custom-navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand img {
+            height: 45px;
+        }
+
+        .navbar-nav .nav-item {
+            position: relative;
+            margin: 0 5px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 1rem 1.25rem;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 82, 204, 0.05);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(0, 82, 204, 0.1);
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 8px;
+        }
+
+        .nav-item.dropdown .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 82, 204, 0.05);
+            color: var(--primary-color);
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-light);
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .user-profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Main Content */
+        .page-title {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+        }
+        
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: inline-block;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: #F8FAFC;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            max-width: 80%;
+        }
+
+        .message-ai {
+            margin-right: auto;
+        }
+
+        .message-user {
+            margin-left: auto;
+        }
+
+        .message-content {
+            padding: 1rem;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .message-ai .message-content {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .message-user .message-content {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .avatar-ai {
+            background-color: rgba(0, 82, 204, 0.1);
+            color: var(--primary-color);
+        }
+
+        .avatar-user {
+            background-color: rgba(54, 179, 126, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .sender-name {
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .quick-action-btn {
+            background-color: rgba(0, 82, 204, 0.05);
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 82, 204, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-btn:hover {
+            background-color: rgba(0, 82, 204, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .chat-input {
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            padding-right: 100px;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .input-buttons {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            color: var(--primary-color);
+            transition: all 0.2s ease;
+        }
+
+        .input-btn:hover {
+            background-color: rgba(0, 82, 204, 0.1);
+        }
+
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .send-btn:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+
+        /* Diagnosis Panel */
+        .diagnosis-panel {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+
+        .diagnosis-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .diagnosis-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+        }
+
+        .diagnosis-body {
+            padding: 1.5rem;
+        }
+
+        .obd-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem;
+            background-color: rgba(0, 184, 217, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .obd-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--info-color);
+            color: white;
+            border-radius: 10px;
+            font-size: 1.25rem;
+        }
+
+        .obd-info {
+            flex-grow: 1;
+        }
+
+        .obd-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .obd-desc {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .diagnosis-steps {
+            margin-bottom: 1.5rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-completed .step-number {
+            background-color: var(--secondary-color);
+        }
+
+        .step-info {
+            flex-grow: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .step-desc {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .recommendations {
+            background-color: rgba(54, 179, 126, 0.1);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary-color);
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .recommendation-icon {
+            color: var(--secondary-color);
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .recommendation-text {
+            flex-grow: 1;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-heading {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .contact-info {
+            color: var(--text-medium);
+        }
+
+        .emergency-number {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .chat-container, .diagnosis-panel {
+                margin-bottom: 2rem;
+            }
+            
+            .navbar-collapse {
+                background-color: var(--white);
+                padding: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                margin-top: 0.5rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem;
+            }
+            
+            .user-profile {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 60vh;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="https://storage.googleapis.com/roadassist-public/roadassist-logo.png" alt="RoadAssist Logo" height="45">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="ai-diagnosis.html">
+                            <i class="fas fa-robot"></i> AI Diagnosis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ar-repair-guide.html">
+                            <i class="fas fa-vr-cardboard"></i> AR Guide
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="predictive-maintenance.html">
+                            <i class="fas fa-tools"></i> Maintenance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fleet-management.html">
+                            <i class="fas fa-truck-moving"></i> Fleet
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-h"></i> More
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="smart-sos.html"><i class="fas fa-bell"></i> Smart SOS</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-map-marked-alt"></i> Traffic & Weather</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice-dollar"></i> Insurance Claims</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="#" class="user-profile">
+                        <img src="https://via.placeholder.com/32x32" alt="User">
+                        <span class="d-none d-md-inline">My Account</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <h1 class="page-title"><i class="fas fa-robot"></i> AI Vehicle Diagnosis</h1>
+        
+        <div class="row">
+            <!-- Chat Interface -->
+            <div class="col-lg-8">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-title">
+                            <i class="fas fa-robot"></i> AI Vehicle Assistant
+                        </div>
+                        <div class="chat-status">
+                            <span class="status-indicator"></span>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages">
+                        <div class="message message-ai">
+                            <div class="message-meta">
+                                <div class="avatar avatar-ai">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="sender-name">Vehicle Assistant</div>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm your AI Vehicle Assistant. I can help diagnose issues with your vehicle. What problem are you experiencing today?</p>
+                                
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn">Car won't start</button>
+                                    <button class="quick-action-btn">Check engine light</button>
+                                    <button class="quick-action-btn">Strange noise</button>
+                                    <button class="quick-action-btn">Overheating</button>
+                                    <button class="quick-action-btn">Battery issues</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message message-user">
+                            <div class="message-meta">
+                                <div class="avatar avatar-user">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="sender-name">You</div>
+                            </div>
+                            <div class="message-content">
+                                <p>My car is making a strange rattling noise when I accelerate above 40mph. It seems to be coming from the front passenger side.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="message message-ai">
+                            <div class="message-meta">
+                                <div class="avatar avatar-ai">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="sender-name">Vehicle Assistant</div>
+                            </div>
+                            <div class="message-content">
+                                <p>I understand you're hearing a rattling noise when accelerating above 40mph, coming from the front passenger side. Let me help diagnose this issue.</p>
+                                <p>Based on your description, this could be several things:</p>
+                                <ol>
+                                    <li>Loose heat shield on the exhaust</li>
+                                    <li>Worn suspension component</li>
+                                    <li>Loose wheel or brake component</li>
+                                </ol>
+                                <p>Would you like me to guide you through some diagnostic steps or connect to your vehicle's OBD-II port for more detailed analysis?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Type your message here...">
+                            <div class="input-buttons">
+                                <button class="input-btn">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="input-btn">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <button class="input-btn send-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagnosis Panel -->
+            <div class="col-lg-4">
+                <div class="diagnosis-panel">
+                    <div class="diagnosis-header">
+                        <div class="diagnosis-title">
+                            <i class="fas fa-stethoscope"></i> Current Diagnosis
+                        </div>
+                    </div>
+                    
+                    <div class="diagnosis-body">
+                        <div class="obd-status">
+                            <div class="obd-icon">
+                                <i class="fas fa-plug"></i>
+                            </div>
+                            <div class="obd-info">
+                                <div class="obd-title">OBD-II Connection</div>
+                                <div class="obd-desc">Connected to 2019 Toyota Camry</div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3">Diagnosis Steps</h5>
+                        <div class="diagnosis-steps">
+                            <div class="step-item step-completed">
+                                <div class="step-number">1</div>
+                                <div class="step-info">
+                                    <div class="step-title">Initial Assessment</div>
+                                    <div class="step-desc">Rattling noise from front passenger side</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item step-completed">
+                                <div class="step-number">2</div>
+                                <div class="step-info">
+                                    <div class="step-title">OBD-II Scan</div>
+                                    <div class="step-desc">No error codes detected</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-info">
+                                    <div class="step-title">Visual Inspection</div>
+                                    <div class="step-desc">Checking suspension components</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-info">
+                                    <div class="step-title">Sound Analysis</div>
+                                    <div class="step-desc">Analyzing recorded audio</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendations">
+                            <div class="recommendation-title">
+                                <i class="fas fa-lightbulb"></i> Recommended Actions
+                            </div>
+                            
+                            <ul class="recommendation-list">
+                                <li class="recommendation-item">
+                                    <i class="fas fa-check-circle recommendation-icon"></i>
+                                    <div class="recommendation-text">Inspect heat shields for looseness</div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <i class="fas fa-check-circle recommendation-icon"></i>
+                                    <div class="recommendation-text">Check front passenger wheel for loose lug nuts</div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <i class="fas fa-check-circle recommendation-icon"></i>
+                                    <div class="recommendation-text">Examine sway bar links and control arm bushings for wear</div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <i class="fas fa-check-circle recommendation-icon"></i>
+                                    <div class="recommendation-text">Schedule appointment with mechanic if unable to identify issue</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4 class="footer-heading">RoadAssist</h4>
+                    <p class="text-muted">Your trusted partner for roadside assistance and vehicle maintenance.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="smart-sos.html" class="text-decoration-none">Emergency SOS</a></li>
+                        <li><a href="index.html" class="text-decoration-none">Dashboard</a></li>
+                        <li><a href="predictive-maintenance.html" class="text-decoration-none">Maintenance</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <div class="contact-info mb-2">Emergency Assistance:</div>
+                    <div class="emergency-number mb-3">1-800-ROAD-HELP</div>
+                    <div class="contact-info">Available 24/7, nationwide.</div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">© 2023 RoadAssist. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS (only for navbar toggle functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

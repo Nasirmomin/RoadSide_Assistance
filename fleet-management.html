@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management - Roadside Assistance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --secondary-color: #10B981;
+            --accent-color: #EF4444;
+            --background-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-medium: #64748B;
+            --text-light: #94A3B8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+        }
+
+        .navbar {
+            padding: 1rem 0;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-dot.active {
+            background-color: var(--secondary-color);
+        }
+
+        .status-dot.warning {
+            background-color: #F59E0B;
+        }
+
+        .status-dot.danger {
+            background-color: var(--accent-color);
+        }
+
+        .status-dot.inactive {
+            background-color: var(--text-medium);
+        }
+
+        .dashboard-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 10px;
+            height: 100%;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+
+        .vehicle-table th {
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+
+        .vehicle-table tbody tr {
+            vertical-align: middle;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .vehicle-table tbody tr:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .vehicle-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .vehicle-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(37, 99, 235, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+
+        .driver-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .status-badge.maintenance {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+        }
+
+        .status-badge.issue {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--accent-color);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-medium);
+        }
+
+        .calendar-view {
+            background-color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .calendar-nav-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            border: none;
+            margin: 0 0.25rem;
+        }
+
+        .calendar-month {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-medium);
+            font-size: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .calendar-day {
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+
+        .calendar-day.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-day:not(.active):hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.5), rgba(16, 185, 129, 0.5));
+            border-radius: 10px;
+            opacity: 0.1;
+        }
+
+        .upcoming-maintenance {
+            margin-top: 2rem;
+        }
+
+        .alert-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            background-color: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-radius: 10px;
+            border: none;
+            background: none;
+            color: var(--text-medium);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="https://storage.googleapis.com/roadassist-public/roadassist-logo.png" alt="RoadAssist Logo" height="45">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html"><i class="fas fa-home"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="#">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-5 pt-5">
+        <div class="row mb-4">
+            <div class="col">
+                <h2>Fleet Management Dashboard</h2>
+                <p class="text-muted">Manage your fleet vehicles and track their status</p>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Vehicle
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Overview -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Total Vehicles</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Active Vehicles</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Maintenance Due</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Issues Reported</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tab-container">
+            <div class="tab-nav">
+                <button class="tab-btn active">All Vehicles</button>
+                <button class="tab-btn">Active</button>
+                <button class="tab-btn">Maintenance</button>
+                <button class="tab-btn">Issues</button>
+            </div>
+        </div>
+        
+        <!-- Fleet Table -->
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title">Fleet Overview</h5>
+                    <div class="input-group" style="max-width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search vehicles...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table vehicle-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Driver</th>
+                                <th>Status</th>
+                                <th>Last Update</th>
+                                <th>Health Score</th>
+                                <th>Next Service</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="vehicle-name">
+                                        <div class="vehicle-icon">
+                                            <i class="fas fa-truck"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Delivery Truck #1</div>
+                                            <div class="text-muted small">CA 1234 ABC</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/50" class="driver-avatar" alt="Driver">
+                                        <span>John Doe</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge active">Active</span>
+                                </td>
+                                <td>
+                                    <div>Today, 10:45 AM</div>
+                                    <div class="text-muted small">On delivery</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="status-dot active"></span>
+                                        <span>92%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>Apr 15, 2023</div>
+                                    <div class="text-muted small">Oil change</div>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button">
+                                            Actions
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="vehicle-name">
+                                        <div class="vehicle-icon">
+                                            <i class="fas fa-car"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Sedan #5</div>
+                                            <div class="text-muted small">CA 5678 XYZ</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/50" class="driver-avatar" alt="Driver">
+                                        <span>Jane Smith</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge maintenance">Maintenance</span>
+                                </td>
+                                <td>
+                                    <div>Yesterday, 3:20 PM</div>
+                                    <div class="text-muted small">At service center</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="status-dot warning"></span>
+                                        <span>75%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>In Progress</div>
+                                    <div class="text-muted small">Brake repair</div>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button">
+                                            Actions
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="vehicle-name">
+                                        <div class="vehicle-icon">
+                                            <i class="fas fa-truck-pickup"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Pickup Truck #3</div>
+                                            <div class="text-muted small">CA 9876 MNO</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/50" class="driver-avatar" alt="Driver">
+                                        <span>Robert Johnson</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge issue">Issue Reported</span>
+                                </td>
+                                <td>
+                                    <div>Today, 8:15 AM</div>
+                                    <div class="text-muted small">Engine warning</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="status-dot danger"></span>
+                                        <span>68%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>Urgent</div>
+                                    <div class="text-muted small">Engine check</div>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button">
+                                            Actions
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Fleet pagination">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Maintenance Calendar & Analytics -->
+        <div class="row mt-4">
+            <div class="col-lg-8">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Maintenance Schedule</h5>
+                        <div class="calendar-view">
+                            <div class="calendar-header">
+                                <div class="calendar-nav">
+                                    <button class="calendar-nav-btn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <div class="calendar-month">April 2023</div>
+                                    <button class="calendar-nav-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-plus me-1"></i>Add Event
+                                </button>
+                            </div>
+                            
+                            <div class="calendar-grid">
+                                <div class="calendar-day-header">Sun</div>
+                                <div class="calendar-day-header">Mon</div>
+                                <div class="calendar-day-header">Tue</div>
+                                <div class="calendar-day-header">Wed</div>
+                                <div class="calendar-day-header">Thu</div>
+                                <div class="calendar-day-header">Fri</div>
+                                <div class="calendar-day-header">Sat</div>
+                                
+                                <!-- Example calendar days - Would be generated dynamically -->
+                                <div class="calendar-day">26</div>
+                                <div class="calendar-day">27</div>
+                                <div class="calendar-day">28</div>
+                                <div class="calendar-day">29</div>
+                                <div class="calendar-day">30</div>
+                                <div class="calendar-day">31</div>
+                                <div class="calendar-day">1</div>
+                                
+                                <div class="calendar-day">2</div>
+                                <div class="calendar-day">3</div>
+                                <div class="calendar-day">4</div>
+                                <div class="calendar-day">5</div>
+                                <div class="calendar-day">6</div>
+                                <div class="calendar-day">7</div>
+                                <div class="calendar-day">8</div>
+                                
+                                <div class="calendar-day">9</div>
+                                <div class="calendar-day">10</div>
+                                <div class="calendar-day active">11</div>
+                                <div class="calendar-day">12</div>
+                                <div class="calendar-day has-event">13</div>
+                                <div class="calendar-day has-event">14</div>
+                                <div class="calendar-day">15</div>
+                                
+                                <div class="calendar-day">16</div>
+                                <div class="calendar-day has-event">17</div>
+                                <div class="calendar-day">18</div>
+                                <div class="calendar-day">19</div>
+                                <div class="calendar-day">20</div>
+                                <div class="calendar-day">21</div>
+                                <div class="calendar-day">22</div>
+                                
+                                <div class="calendar-day">23</div>
+                                <div class="calendar-day">24</div>
+                                <div class="calendar-day">25</div>
+                                <div class="calendar-day has-event">26</div>
+                                <div class="calendar-day">27</div>
+                                <div class="calendar-day">28</div>
+                                <div class="calendar-day">29</div>
+                                
+                                <div class="calendar-day">30</div>
+                                <div class="calendar-day">1</div>
+                                <div class="calendar-day">2</div>
+                                <div class="calendar-day">3</div>
+                                <div class="calendar-day">4</div>
+                                <div class="calendar-day">5</div>
+                                <div class="calendar-day">6</div>
+                            </div>
+                        </div>
+                        
+                        <div class="upcoming-maintenance mt-4">
+                            <h6>Upcoming Maintenance (April 11)</h6>
+                            <div class="alert alert-info" role="alert">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-tools fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="alert-heading mb-1">Regular Service for 3 Vehicles</h6>
+                                        <p class="mb-0">Scheduled at Downtown Service Center at 9:00 AM</p>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Fleet Analytics</h5>
+                        
+                        <div class="mb-4">
+                            <h6>Vehicle Health Overview</h6>
+                            <div class="chart-container">
+                                <div class="chart-placeholder"></div>
+                                <!-- Actual chart would be rendered here with JS -->
+                                <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                    <p class="mb-0">Fleet Health Average</p>
+                                    <h3 class="text-primary">82%</h3>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6>Recent Breakdowns</h6>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Sedan #2 - Flat Tire</h6>
+                                        <small>2 days ago</small>
+                                    </div>
+                                    <p class="mb-1">Fixed on-site by mobile mechanic</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Truck #5 - Battery Issue</h6>
+                                        <small>5 days ago</small>
+                                    </div>
+                                    <p class="mb-1">Battery replaced at service center</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bulk Actions Card -->
+                <div class="card dashboard-card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Bulk Actions</h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-calendar-check me-2"></i>Schedule Service for Multiple Vehicles
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-bell me-2"></i>Send Alert to All Drivers
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-file-export me-2"></i>Export Fleet Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (without JS functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
